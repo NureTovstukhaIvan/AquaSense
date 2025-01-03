@@ -1,0 +1,923 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "AquaSense API",
+    "version": "1.0.0",
+    "description": "API для керування AquaSense системою"
+  },
+  "host": "localhost:3000",
+  "schemes": ["http"],
+  "tags": [
+    {
+      "name": "Authorization",
+      "description": ""
+    },
+    {
+      "name": "Users",
+      "description": ""
+    },
+    {
+      "name": "Aquariums manage",
+      "description": ""
+    },
+    {
+      "name": "Devices manager",
+      "description": ""
+    },
+    {
+      "name": "Sensors manager",
+      "description": ""
+    },
+    {
+      "name": "Logs manager",
+      "description": ""
+    }
+  ],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "tags": ["Authorization"],
+        "summary": "Реєстрація користувача",
+        "description": "Створення нового користувача",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Дані нового користувача",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": { "type": "string" },
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+              },
+              "required": ["username", "email", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Користувача успішно створено"
+          },
+          "400": {
+            "description": "Користувач вже існує"
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": ["Authorization"],
+        "summary": "Авторизація користувача",
+        "description": "Вхід користувача",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Дані для входу",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+              },
+              "required": ["email", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Авторизація успішна"
+          },
+          "401": {
+            "description": "Невірні дані для входу"
+          },
+          "404": {
+            "description": "Користувача не знайдено"
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Отримання списку всіх користувачів",
+        "description": "Повертає список усіх користувачів у системі",
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "username": { "type": "string" },
+                  "email": { "type": "string" },
+                  "created_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Отримання користувача за id",
+        "description": "Повертає інформацію про користувача за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id користувача"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "username": { "type": "string" },
+                "email": { "type": "string" },
+                "created_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "404": {
+            "description": "Користувача не знайдено"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Оновлення даних користувача",
+        "description": "Оновлює дані користувача за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id користувача для оновлення"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Нові дані користувача",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "username": { "type": "string" },
+                "email": { "type": "string" }
+              },
+              "required": ["username", "email"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Дані користувача успішно оновлено"
+          },
+          "404": {
+            "description": "Користувача не знайдено"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Видалення користувача",
+        "description": "Видаляє користувача за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id користувача для видалення"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Користувача успішно видалено"
+          },
+          "404": {
+            "description": "Користувача не знайдено"
+          }
+        }
+      }
+    },
+    "/aquariums": {
+      "post": {
+        "tags": ["Aquariums manage"],
+        "summary": "Створити новий акваріум",
+        "description": "Додає новий акваріум до бази даних",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Дані нового акваріума",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user_id": { "type": "integer" },
+                "name": { "type": "string" },
+                "specification": { "type": "string" }
+              },
+              "required": ["user_id", "name"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Акваріум успішно створено"
+          },
+          "500": {
+            "description": "Помилка створення акваріума"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Aquariums manage"],
+        "summary": "Отримати всі акваріуми",
+        "description": "Повертає список усіх акваріумів у системі",
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "user_id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "specification": { "type": "string" },
+                  "created_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/aquariums/user/{userId}": {
+      "get": {
+        "tags": ["Aquariums manage"],
+        "summary": "Отримати всі акваріуми для користувача за його id",
+        "description": "Повертає список акваріумів, що належать конкретному користувачу за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "type": "integer",
+            "description": "id користувача"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "user_id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "specification": { "type": "string" },
+                  "created_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Користувача не знайдено або у користувача немає акваріумів"
+          }
+        }
+      }
+    },
+    "/aquariums/{id}": {
+      "get": {
+        "tags": ["Aquariums manage"],
+        "summary": "Отримати акваріум за його id",
+        "description": "Повертає інформацію про акваріум за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id акваріума"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "user_id": { "type": "integer" },
+                "name": { "type": "string" },
+                "specification": { "type": "string" },
+                "created_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "404": {
+            "description": "Акваріум не знайдено"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Aquariums manage"],
+        "summary": "Оновити інформацію про акваріум",
+        "description": "Оновлює інформацію про акваріум за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id акваріума"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Нові дані акваріума",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "specification": { "type": "string" }
+              },
+              "required": ["name", "specification"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Акваріум успішно оновлено"
+          },
+          "404": {
+            "description": "Акваріум не знайдено"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Aquariums manage"],
+        "summary": "Видалити акваріум",
+        "description": "Видаляє акваріум за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id акваріума"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Акваріум успішно видалено"
+          },
+          "404": {
+            "description": "Акваріум не знайдено"
+          }
+        }
+      }
+    },
+    "/devices": {
+      "post": {
+        "tags": ["Devices manager"],
+        "summary": "Створити новий девайс",
+        "description": "Додає новий девайс до акваріума",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Дані нового девайса",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "aquarium_id": { "type": "integer" },
+                "name": { "type": "string" },
+                "status": { "type": "string", "enum": ["on", "off"] }
+              },
+              "required": ["aquarium_id", "name"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Девайс успішно створено"
+          },
+          "500": {
+            "description": "Помилка створення девайса"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Devices manager"],
+        "summary": "Отримати всі девайси",
+        "description": "Повертає список усіх девайсів у системі",
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "aquarium_id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "status": { "type": "string", "enum": ["on", "off"] },
+                  "created_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices/aquarium/{aquariumId}": {
+      "get": {
+        "tags": ["Devices manager"],
+        "summary": "Отримати всі девайси для акваріуму за його id",
+        "description": "Повертає список девайсів, що належать до конкретного акваріума за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "aquariumId",
+            "required": true,
+            "type": "integer",
+            "description": "id акваріума"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "aquarium_id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "status": { "type": "string", "enum": ["on", "off"] },
+                  "created_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Акваріум не знайдено або в акваріумі немає девайсів"
+          }
+        }
+      }
+    },
+    "/devices/{id}": {
+      "get": {
+        "tags": ["Devices manager"],
+        "summary": "Отримати девайс за його id",
+        "description": "Повертає інформацію про девайс за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id девайса"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "aquarium_id": { "type": "integer" },
+                "name": { "type": "string" },
+                "status": { "type": "string", "enum": ["on", "off"] },
+                "created_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "404": {
+            "description": "Девайс не знайдено"
+          }
+        }
+      },
+      "put": {
+        "tags": ["Devices manager"],
+        "summary": "Оновити девайс",
+        "description": "Оновлює інформацію про девайс за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id девайса"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Нові дані девайса",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "status": { "type": "string", "enum": ["on", "off"] }
+              },
+              "required": ["name", "status"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Девайс успішно оновлено"
+          },
+          "404": {
+            "description": "Девайс не знайдено"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Devices manager"],
+        "summary": "Видалити девайс",
+        "description": "Видаляє девайс за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id девайса"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Девайс успішно видалено"
+          },
+          "404": {
+            "description": "Девайс не знайдено"
+          }
+        }
+      }
+    },
+    "/sensors": {
+      "post": {
+        "tags": ["Sensors manager"],
+        "summary": "Створити новий датчик",
+        "description": "Додає новий датчик до бази даних",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Дані нового датчика",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "aquarium_id": { "type": "integer" },
+                "type": { "type": "string" },
+                "value": { "type": "number", "format": "float" }
+              },
+              "required": ["aquarium_id", "type", "value"]
+            }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Датчик успішно створено" },
+          "500": { "description": "Помилка створення датчика" }
+        }
+      },
+      "get": {
+        "tags": ["Sensors manager"],
+        "summary": "Отримати всі датчики",
+        "description": "Повертає список усіх датчиків у системі",
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "aquarium_id": { "type": "integer" },
+                  "type": { "type": "string" },
+                  "value": { "type": "number", "format": "float" },
+                  "created_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sensors/aquarium/{aquariumId}": {
+      "get": {
+        "tags": ["Sensors manager"],
+        "summary": "Отримати всі датчики для акваріуму за його id",
+        "description": "Повертає список датчиків, що належать до конкретного акваріума за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "aquariumId",
+            "required": true,
+            "type": "integer",
+            "description": "id акваріума"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "aquarium_id": { "type": "integer" },
+                  "type": { "type": "string" },
+                  "value": { "type": "number", "format": "float" },
+                  "created_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Акваріум не знайдено або в акваріумі немає датчиків"
+          }
+        }
+      }
+    },
+    "/sensors/{id}": {
+      "get": {
+        "tags": ["Sensors manager"],
+        "summary": "Отримати датчик за id",
+        "description": "Повертає інформацію про датчик за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id датчика"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "aquarium_id": { "type": "integer" },
+                "type": { "type": "string" },
+                "value": { "type": "number", "format": "float" },
+                "created_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "404": { "description": "Датчик не знайдено" }
+        }
+      },
+      "put": {
+        "tags": ["Sensors manager"],
+        "summary": "Оновити інформацію про датчик",
+        "description": "Оновлює інформацію про датчик за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id датчика"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Нові дані датчика",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" },
+                "value": { "type": "number", "format": "float" }
+              },
+              "required": ["type", "value"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Датчик успішно оновлено" },
+          "404": { "description": "Датчик не знайдено" }
+        }
+      },
+      "delete": {
+        "tags": ["Sensors manager"],
+        "summary": "Видалити датчик",
+        "description": "Видаляє датчик за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id датчика"
+          }
+        ],
+        "responses": {
+          "200": { "description": "Датчик успішно видалено" },
+          "404": { "description": "Датчик не знайдено" }
+        }
+      }
+    },
+    "/logs": {
+      "post": {
+        "tags": ["Logs manager"],
+        "summary": "Створити новий лог",
+        "description": "Додає новий лог до бази даних",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "description": "Дані нового логу",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sensor_id": { "type": "integer" },
+                "message": { "type": "string" }
+              },
+              "required": ["sensor_id", "message"]
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Лог успішно створено"
+          },
+          "500": {
+            "description": "Помилка створення логу"
+          }
+        }
+      },
+      "get": {
+        "tags": ["Logs manager"],
+        "summary": "Отримати всі логи",
+        "description": "Повертає список усіх логів у системі",
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "sensor_id": { "type": "integer" },
+                  "message": { "type": "string" },
+                  "logged_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/logs/sensor/{sensorId}": {
+      "get": {
+        "tags": ["Logs manager"],
+        "summary": "Отримати всі логи для датчика за його id",
+        "description": "Повертає список логів, пов'язаних із конкретним датчиком",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sensorId",
+            "required": true,
+            "type": "integer",
+            "description": "id датчика"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "sensor_id": { "type": "integer" },
+                  "message": { "type": "string" },
+                  "logged_at": { "type": "string", "format": "date-time" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Логи для датчика не знайдено"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Logs manager"],
+        "summary": "Видалити всі логи для датчика за його id",
+        "description": "Видаляє всі логи, пов'язані з конкретним датчиком",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sensorId",
+            "required": true,
+            "type": "integer",
+            "description": "id датчика"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Логи успішно видалено"
+          },
+          "404": {
+            "description": "Логи для датчика не знайдено"
+          }
+        }
+      }
+    },
+    "/logs/{id}": {
+      "get": {
+        "tags": ["Logs manager"],
+        "summary": "Знайти лог за id",
+        "description": "Повертає лог із вказаним id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id логу"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успішно",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": { "type": "integer" },
+                "sensor_id": { "type": "integer" },
+                "message": { "type": "string" },
+                "logged_at": { "type": "string", "format": "date-time" }
+              }
+            }
+          },
+          "404": {
+            "description": "Лог не знайдено"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Logs manager"],
+        "summary": "Видалити лог за його id",
+        "description": "Видаляє лог за його id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "type": "integer",
+            "description": "id логу"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Лог успішно видалено"
+          },
+          "404": {
+            "description": "Лог не знайдено"
+          }
+        }
+      }
+    }
+  }
+}
